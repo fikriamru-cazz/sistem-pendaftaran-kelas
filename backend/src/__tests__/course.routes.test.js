@@ -1,16 +1,16 @@
+import { vi, describe, it, expect, afterAll, afterEach, beforeAll } from 'vitest';
 import request from 'supertest';
-import app from '../index';
-import { PrismaClient, Role } from '@prisma/client';
-import { protect, isAdmin } from '../middleware/auth.middleware';
+import app from '../index.js';
+import { PrismaClient } from '@prisma/client';
 
 // Mock the middleware
-jest.mock('../middleware/auth.middleware', () => ({
+vi.mock('../middleware/auth.middleware.js', () => ({
   __esModule: true,
-  protect: jest.fn((req, res, next) => {
+  protect: vi.fn((req, res, next) => {
     req.user = { userId: 'cl-mock-user-id', role: 'STUDENT' }; // Default mock as STUDENT
     next();
   }),
-  isAdmin: jest.fn((req, res, next) => {
+  isAdmin: vi.fn((req, res, next) => {
     if (req.user && req.user.role === 'ADMIN') {
       next();
     } else {
@@ -28,7 +28,8 @@ describe('Course Routes', () => {
 
   describe('GET /api/courses', () => {
     it('should return 401 Unauthorized if no token is provided', async () => {
-      (protect as jest.Mock).mockImplementationOnce((req, res, next) => {
+      const { protect } = await import('../middleware/auth.middleware.js');
+      protect.mockImplementationOnce((req, res, next) => {
         return res.status(401).json({ message: 'Not authorized, no token' });
       });
       const response = await request(app).get('/api/courses');
@@ -36,7 +37,8 @@ describe('Course Routes', () => {
     });
 
     it('should return 200 OK for an authenticated user', async () => {
-      (protect as jest.Mock).mockImplementationOnce((req, res, next) => {
+      const { protect } = await import('../middleware/auth.middleware.js');
+      protect.mockImplementationOnce((req, res, next) => {
         req.user = { userId: 'cl-mock-user-id', role: 'STUDENT' };
         next();
       });
@@ -52,7 +54,7 @@ describe('Course Routes', () => {
       description: 'A course created during a test run',
       quota: 20,
     };
-    let createdCourseId: string;
+    let createdCourseId;
 
     afterEach(async () => {
       // Clean up the created course
@@ -69,8 +71,9 @@ describe('Course Routes', () => {
     });
 
     it('should create a new course and return 201 for an admin user', async () => {
+      const { protect } = await import('../middleware/auth.middleware.js');
       // Override the mock for this specific test to be an ADMIN
-      (protect as jest.Mock).mockImplementationOnce((req, res, next) => {
+      protect.mockImplementationOnce((req, res, next) => {
         req.user = { userId: 'cl-mock-admin-id', role: 'ADMIN' };
         next();
       });

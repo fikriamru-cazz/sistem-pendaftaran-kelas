@@ -1,25 +1,26 @@
+import { vi, describe, it, expect, afterAll, afterEach, beforeAll } from 'vitest';
 import request from 'supertest';
-import app from '../index'; // Assuming your Express app is exported from index.ts
-import { PrismaClient, Role } from '@prisma/client';
+import app from '../index.js'; // Assuming your Express app is exported from index.ts
+import { PrismaClient } from '@prisma/client';
 
 // Mock the protect middleware
-jest.mock('../middleware/auth.middleware', () => ({
+vi.mock('../middleware/auth.middleware.js', () => ({
   __esModule: true,
-  protect: jest.fn((req, res, next) => {
+  protect: vi.fn((req, res, next) => {
     // Default mock user is a STUDENT
-    req.user = { userId: 'mock-student-id', role: Role.STUDENT };
+    req.user = { userId: 'mock-student-id', role: 'STUDENT' };
     next();
   }),
-  isAdmin: jest.fn(), // Not used in these tests, but needs to be mocked
+  isAdmin: vi.fn(), // Not used in these tests, but needs to be mocked
 }));
 
 const prisma = new PrismaClient();
 
 describe('Registration Routes', () => {
-  let testCourse_available: any;
-  let testCourse_registered_and_full: any;
-  let testCourse_registered_not_full: any;
-  let testStudent: any;
+  let testCourse_available;
+  let testCourse_registered_and_full;
+  let testCourse_registered_not_full;
+  let testStudent;
 
   beforeAll(async () => {
     // Create a test student
@@ -106,9 +107,10 @@ describe('Registration Routes', () => {
             data: { email: `another-student-${Date.now()}@test.com`, name: 'Another', password: 'pw' }
         });
 
+        const { protect } = await import('../middleware/auth.middleware.js');
         // Mock the request as if it's from the new student
-        (require('../middleware/auth.middleware').protect as jest.Mock).mockImplementationOnce((req, res, next) => {
-            req.user = { userId: anotherStudent.id, role: Role.STUDENT };
+        protect.mockImplementationOnce((req, res, next) => {
+            req.user = { userId: anotherStudent.id, role: 'STUDENT' };
             next();
         });
 
