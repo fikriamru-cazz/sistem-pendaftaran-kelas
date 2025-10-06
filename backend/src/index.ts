@@ -1,3 +1,4 @@
+console.log("SERVER RELOAD: Memastikan rute user termuat...");
 import express, { Request, Response } from 'express';
   import cors from 'cors';
   import authRoutes from './routes/auth.routes';
