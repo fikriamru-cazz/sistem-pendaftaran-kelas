@@ -1,9 +1,10 @@
 import app from './index';
 
-      const PORT = process.env.PORT || 3001;
-      const HOST = '0.0.0.0'; // Pastikan baris ini masih seperti ini
+  const PORT = process.env.PORT || 3001;
+  // Langsung hardcode ke '0.0.0.0' untuk memastikan berjalan di Render
+  const HOST = '0.0.0.0';
 
-      app.listen(Number(PORT), HOST, () => {
-        // Tambahkan tulisan "VERSI BARU" di sini
-        console.log(VERSI BARU: Server berjalan di http://${HOST}:${PORT});
-      });
+  app.listen(Number(PORT), HOST, () => {
+    // Pesan log final untuk tes
+    console.log(VERSI FINAL: Server berjalan di http://${HOST}:${PORT});
+  });
