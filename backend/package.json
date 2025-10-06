@@ -8,7 +8,7 @@
     "test": "jest",
     "dev": "nodemon --exec node --loader ts-node/esm --experimental-specifier-resolution=node src/server.ts",
     "build": "tsc",
-    "start": "npx prisma migrate deploy && node dist/server.js"
+    "start": "npx prisma migrate deploy && node dist/server.js"	
   },
   "keywords": [],
   "author": "",
