@@ -9,7 +9,9 @@ const app = express();
 
  app.use(cors({
         origin: "https://akademik-univ-almuttaqiin.vercel.app"
-      }));app.use(express.json());
+      }));
+
+      app.use(express.json());
 
 // API Routes
 app.use('/api/auth', authRoutes);
