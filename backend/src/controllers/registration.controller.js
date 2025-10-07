@@ -1,13 +1,11 @@
-import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { AuthRequest } from '../middleware/auth.middleware.js';
 
 const prisma = new PrismaClient();
 
 // @desc    Register for a course
 // @route   POST /api/registrations/:courseId/register
 // @access  Private
-export const registerForCourse = async (req: AuthRequest, res: Response) => {
+export const registerForCourse = async (req, res) => {
   const { courseId } = req.params;
   const userId = req.user?.userId;
 
@@ -54,7 +52,7 @@ export const registerForCourse = async (req: AuthRequest, res: Response) => {
 
     res.status(201).json({ message: 'Successfully registered for the course', registration: result });
 
-  } catch (error: any) {
+  } catch (error) {
     // Handle specific errors from the transaction
     if (error.message === 'Course not found') {
       return res.status(404).json({ message: error.message });
@@ -64,7 +62,7 @@ export const registerForCourse = async (req: AuthRequest, res: Response) => {
     }
     // Handle potential unique constraint violation if transaction fails
     if (error.code === 'P2002') {
-         return res.status(400).json({ message: 'User already registered for this course' });
+      return res.status(400).json({ message: 'User already registered for this course' });
     }
     res.status(500).json({ message: 'Something went wrong during registration', error: error.message });
   }
@@ -74,22 +72,22 @@ export const registerForCourse = async (req: AuthRequest, res: Response) => {
 // @desc    Get my registered courses
 // @route   GET /api/registrations/my-registrations
 // @access  Private
-export const getMyRegistrations = async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.userId;
+export const getMyRegistrations = async (req, res) => {
+  const userId = req.user?.userId;
 
-    if (!userId) {
-        return res.status(401).json({ message: 'Not authorized' });
-    }
+  if (!userId) {
+    return res.status(401).json({ message: 'Not authorized' });
+  }
 
-    try {
-        const registrations = await prisma.registration.findMany({
-            where: { userId },
-            include: { 
-                course: true // Include the full course details
-            },
-        });
-        res.json(registrations);
-    } catch (error) {
-        res.status(500).json({ message: 'Something went wrong', error });
-    }
+  try {
+    const registrations = await prisma.registration.findMany({
+      where: { userId },
+      include: {
+        course: true // Include the full course details
+      },
+    });
+    res.json(registrations);
+  } catch (error) {
+    res.status(500).json({ message: 'Something went wrong', error });
+  }
 };

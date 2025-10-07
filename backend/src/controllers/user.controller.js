@@ -1,13 +1,11 @@
-import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { AuthRequest } from '../middleware/auth.middleware.js';
 
 const prisma = new PrismaClient();
 
 // @desc    Get all users
 // @route   GET /api/users
 // @access  Private/Admin
-export const getAllUsers = async (req: AuthRequest, res: Response) => {
+export const getAllUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
       // Explicitly select fields to exclude password
@@ -18,7 +16,7 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
         role: true,
         createdAt: true,
         _count: {
-            select: { registrations: true }
+          select: { registrations: true }
         }
       },
       orderBy: {
